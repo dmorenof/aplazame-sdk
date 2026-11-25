@@ -7,22 +7,22 @@ namespace AplazameSDK\DTOs;
 final class Merchant extends \Dmorenof\SdkRuntime\DTO
 {
     public const array REQUIRED_FIELDS = [
-    'error_url',
-    'notification_url',
-    'pending_url',
-    'success_url',
-];
+        'error_url',
+        'notification_url',
+        'pending_url',
+        'success_url',
+    ];
 
     protected const array VALIDATION = [
-    'timeout_checkout' => [
-        'minimum' => 1,
-        'maximum' => 120,
-    ],
-    'timeout_extra' => [
-        'minimum' => 0,
-        'maximum' => 2880,
-    ],
-];
+        'timeout_checkout' => [
+            'minimum' => 1,
+            'maximum' => 120,
+        ],
+        'timeout_extra' => [
+            'minimum' => 0,
+            'maximum' => 2880,
+        ],
+    ];
 
     public bool $close_on_success;
     public string $dismiss_url;

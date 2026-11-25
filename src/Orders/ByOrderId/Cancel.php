@@ -14,5 +14,4 @@ final class Cancel extends \AplazameSDK\AplazameAPISDK
     {
         self::client()->resource(\AplazameSDK\Resources\Orders\ByOrderId\Cancel::class)->post($orderId);
     }
-
 }

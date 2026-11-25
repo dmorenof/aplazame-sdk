@@ -7,8 +7,8 @@ namespace AplazameSDK\DTOs;
 final class ConfirmationResponse extends \Dmorenof\SdkRuntime\DTO
 {
     public const array REQUIRED_FIELDS = [
-    'status',
-];
+        'status',
+    ];
 
     public string $order_id;
     public \AplazameSDK\Enums\ConfirmationResponse\StatusEnum $status;

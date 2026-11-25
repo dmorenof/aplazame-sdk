@@ -59,5 +59,4 @@ final class Campaigns extends \AplazameSDK\AplazameAPISDK
     {
         self::client()->resource(\AplazameSDK\Resources\Me\Campaigns::class)->putByCampaignId($campaignId, $payload);
     }
-
 }

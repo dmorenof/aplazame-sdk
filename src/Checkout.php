@@ -14,5 +14,4 @@ final class Checkout extends \AplazameSDK\AplazameAPISDK
     {
         return self::client()->resource(\AplazameSDK\Resources\Checkout::class)->post($payload);
     }
-
 }

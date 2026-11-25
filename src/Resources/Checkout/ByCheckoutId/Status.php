@@ -52,5 +52,4 @@ final class Status extends \AplazameSDK\Client
         $result = $this->executeArguments(self::operation(self::GET), path: ['checkoutId' => $checkoutId]);
         return $result;
     }
-
 }

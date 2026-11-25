@@ -41,5 +41,4 @@ final class Orders extends \AplazameSDK\AplazameAPISDK
     {
         self::client()->resource(\AplazameSDK\Resources\Orders::class)->putByOrderId($orderId, $payload);
     }
-
 }

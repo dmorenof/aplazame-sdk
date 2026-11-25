@@ -14,5 +14,4 @@ final class Offline extends \AplazameSDK\AplazameAPISDK
     {
         return self::client()->resource(\AplazameSDK\Resources\Checkout\Offline::class)->post($payload);
     }
-
 }

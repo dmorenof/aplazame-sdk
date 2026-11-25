@@ -7,16 +7,16 @@ namespace AplazameSDK\DTOs;
 final class Shipping extends \Dmorenof\SdkRuntime\DTO
 {
     public const array REQUIRED_FIELDS = [
-    'city',
-    'country',
-    'first_name',
-    'last_name',
-    'name',
-    'postcode',
-    'price',
-    'state',
-    'street',
-];
+        'city',
+        'country',
+        'first_name',
+        'last_name',
+        'name',
+        'postcode',
+        'price',
+        'state',
+        'street',
+    ];
 
     public string $address_addition;
     public string $alt_phone;

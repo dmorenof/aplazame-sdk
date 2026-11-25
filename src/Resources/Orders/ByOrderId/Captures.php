@@ -105,5 +105,4 @@ final class Captures extends \AplazameSDK\Client
         $result = $this->executeBody(self::operation(self::POST), $payload, path: ['orderId' => $orderId]);
         return $result;
     }
-
 }

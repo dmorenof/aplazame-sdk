@@ -7,8 +7,8 @@ namespace AplazameSDK\DTOs;
 final class Customer extends \Dmorenof\SdkRuntime\DTO
 {
     public const array REQUIRED_FIELDS = [
-    'email',
-];
+        'email',
+    ];
 
     public \AplazameSDK\DTOs\Customer\AddressDTO $address;
     /**

@@ -7,9 +7,9 @@ namespace AplazameSDK\DTOs;
 final class OfflineCheckoutRequest extends \Dmorenof\SdkRuntime\DTO
 {
     public const array REQUIRED_FIELDS = [
-    'customer',
-    'order',
-];
+        'customer',
+        'order',
+    ];
 
     public \AplazameSDK\DTOs\Billing $billing;
     public \AplazameSDK\DTOs\Customer $customer;

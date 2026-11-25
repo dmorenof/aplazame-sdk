@@ -7,8 +7,8 @@ namespace AplazameSDK\DTOs\Order;
 final class Edit extends \Dmorenof\SdkRuntime\DTO
 {
     public const array REQUIRED_FIELDS = [
-    'order',
-];
+        'order',
+    ];
 
     public \AplazameSDK\DTOs\Order $order;
 

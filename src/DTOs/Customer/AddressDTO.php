@@ -7,12 +7,12 @@ namespace AplazameSDK\DTOs\Customer;
 final class AddressDTO extends \Dmorenof\SdkRuntime\DTO
 {
     public const array REQUIRED_FIELDS = [
-    'city',
-    'country',
-    'postcode',
-    'state',
-    'street',
-];
+        'city',
+        'country',
+        'postcode',
+        'state',
+        'street',
+    ];
 
     public string $address_addition;
     public string $alt_phone;

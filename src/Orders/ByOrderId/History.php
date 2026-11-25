@@ -14,5 +14,4 @@ final class History extends \AplazameSDK\AplazameAPISDK
     {
         self::client()->resource(\AplazameSDK\Resources\Orders\ByOrderId\History::class)->post($orderId, $payload);
     }
-
 }

@@ -7,10 +7,10 @@ namespace AplazameSDK\DTOs\Campaign;
 final class Input extends \Dmorenof\SdkRuntime\DTO
 {
     public const array REQUIRED_FIELDS = [
-    'interest',
-    'name',
-    'start_date',
-];
+        'interest',
+        'name',
+        'start_date',
+    ];
 
     /**
      * Format: date-time

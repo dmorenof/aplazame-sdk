@@ -61,5 +61,4 @@ final class Offline extends \AplazameSDK\Client
         $result = $this->executeBody(self::operation(self::POST), $payload);
         return $result;
     }
-
 }

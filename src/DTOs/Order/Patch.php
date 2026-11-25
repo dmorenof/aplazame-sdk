@@ -10,5 +10,4 @@ final class Patch extends \Dmorenof\SdkRuntime\DTO
      * Partial order: any of the fields of an order
      */
     public \AplazameSDK\DTOs\Order\Patch\OrderMap $order;
-
 }

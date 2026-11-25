@@ -72,5 +72,4 @@ final class Checkout extends \AplazameSDK\Client
         $result = $this->executeBody(self::operation(self::POST), $payload);
         return $result;
     }
-
 }

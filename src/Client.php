@@ -7,13 +7,13 @@ namespace AplazameSDK;
 class Client extends \Dmorenof\SdkRuntime\ApiClient
 {
     protected const array SECURITY_SCHEMES = [
-    'privateKey' => [
-        'type' => 'http',
-        'scheme' => 'bearer',
-        'location' => null,
-        'parameterName' => null,
-    ],
-];
+        'privateKey' => [
+            'type' => 'http',
+            'scheme' => 'bearer',
+            'location' => null,
+            'parameterName' => null,
+        ],
+    ];
 
     private static ?self $currentConnection = null;
 

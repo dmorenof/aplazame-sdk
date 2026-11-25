@@ -7,11 +7,11 @@ namespace AplazameSDK\DTOs;
 final class Order extends \Dmorenof\SdkRuntime\DTO
 {
     public const array REQUIRED_FIELDS = [
-    'articles',
-    'currency',
-    'id',
-    'total_amount',
-];
+        'articles',
+        'currency',
+        'id',
+        'total_amount',
+    ];
 
     public \AplazameSDK\Collections\Order\ArticlesCollection $articles;
     public int $cart_discount;

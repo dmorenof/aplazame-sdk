@@ -23,5 +23,4 @@ final class VoidResource extends \AplazameSDK\AplazameAPISDK
     {
         return self::client()->resource(\AplazameSDK\Resources\Orders\ByOrderId\VoidResource::class)->post($orderId, $payload);
     }
-
 }

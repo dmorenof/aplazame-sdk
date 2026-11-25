@@ -7,13 +7,13 @@ namespace AplazameSDK\DTOs;
 final class Article extends \Dmorenof\SdkRuntime\DTO
 {
     public const array REQUIRED_FIELDS = [
-    'id',
-    'image_url',
-    'name',
-    'price',
-    'quantity',
-    'url',
-];
+        'id',
+        'image_url',
+        'name',
+        'price',
+        'quantity',
+        'url',
+    ];
 
     public string $description;
     public int $discount;

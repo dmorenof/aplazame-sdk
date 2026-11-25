@@ -23,5 +23,4 @@ final class Captures extends \AplazameSDK\AplazameAPISDK
     {
         return self::client()->resource(\AplazameSDK\Resources\Orders\ByOrderId\Captures::class)->post($orderId, $payload);
     }
-
 }

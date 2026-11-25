@@ -23,5 +23,4 @@ final class Refund extends \AplazameSDK\AplazameAPISDK
     {
         return self::client()->resource(\AplazameSDK\Resources\Orders\ByOrderId\Refund::class)->post($orderId, $payload);
     }
-
 }

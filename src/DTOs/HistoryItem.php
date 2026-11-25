@@ -7,13 +7,13 @@ namespace AplazameSDK\DTOs;
 final class HistoryItem extends \Dmorenof\SdkRuntime\DTO
 {
     public const array REQUIRED_FIELDS = [
-    'amount',
-    'currency',
-    'id',
-    'order_date',
-    'status',
-    'type',
-];
+        'amount',
+        'currency',
+        'id',
+        'order_date',
+        'status',
+        'type',
+    ];
 
     public int $amount;
     public \AplazameSDK\DTOs\Billing $billing;

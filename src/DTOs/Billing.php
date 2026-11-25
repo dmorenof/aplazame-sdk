@@ -7,14 +7,14 @@ namespace AplazameSDK\DTOs;
 final class Billing extends \Dmorenof\SdkRuntime\DTO
 {
     public const array REQUIRED_FIELDS = [
-    'city',
-    'country',
-    'first_name',
-    'last_name',
-    'postcode',
-    'state',
-    'street',
-];
+        'city',
+        'country',
+        'first_name',
+        'last_name',
+        'postcode',
+        'state',
+        'street',
+    ];
 
     public string $address_addition;
     public string $alt_phone;

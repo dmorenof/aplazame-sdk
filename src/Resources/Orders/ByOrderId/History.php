@@ -58,5 +58,4 @@ final class History extends \AplazameSDK\Client
         $this->executeBody(self::operation(self::POST), $payload, path: ['orderId' => $orderId]);
         return;
     }
-
 }

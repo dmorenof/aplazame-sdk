@@ -7,8 +7,8 @@ namespace AplazameSDK\DTOs;
 final class Amount extends \Dmorenof\SdkRuntime\DTO
 {
     public const array REQUIRED_FIELDS = [
-    'amount',
-];
+        'amount',
+    ];
 
     /**
      * Cents

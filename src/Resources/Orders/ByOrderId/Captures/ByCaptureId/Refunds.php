@@ -105,5 +105,4 @@ final class Refunds extends \AplazameSDK\Client
         $result = $this->executeBody(self::operation(self::POST), $payload, path: $identifier);
         return $result;
     }
-
 }

@@ -14,5 +14,4 @@ final class Status extends \AplazameSDK\AplazameAPISDK
     {
         return self::client()->resource(\AplazameSDK\Resources\Checkout\ByCheckoutId\Status::class)->get($checkoutId);
     }
-
 }

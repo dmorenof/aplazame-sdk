@@ -52,5 +52,4 @@ final class Cancel extends \AplazameSDK\Client
         $this->executeArguments(self::operation(self::POST), path: ['orderId' => $orderId]);
         return;
     }
-
 }
