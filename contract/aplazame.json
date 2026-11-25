@@ -1,0 +1,2399 @@
+{
+ "openapi": "3.0.3",
+ "info": {
+  "title": "Aplazame API",
+  "version": "1.0.0",
+  "description": "Aplazame (buy now, pay later) merchant API: checkout creation, order management (captures, voids, refunds, cancellation, history), campaigns and POS checkout. Reconstructed from the public documentation at https://aplazame.com/en/docs/api/ : Aplazame publishes no machine-readable contract. Amounts are integers in cents. The version is chosen by the media type of `Accept` (`application/vnd.aplazame.v1+json`; the POS checkout uses v3). The notification Aplazame sends to the merchant (`notification_url`) is documented as the `Notification` model, and its answer as `ConfirmationResponse`. The documentation of the campaign articles and of the answer to `POST /checkout` is not complete."
+ },
+ "servers": [
+  {
+   "url": "https://api.aplazame.com"
+  }
+ ],
+ "paths": {
+  "/checkout": {
+   "post": {
+    "operationId": "createCheckout",
+    "summary": "Create a checkout (installments by default; product.type selects pay_later or pay_in_4)",
+    "tags": [
+     "Checkout"
+    ],
+    "security": [
+     {
+      "privateKey": []
+     }
+    ],
+    "responses": {
+     "201": {
+      "description": "Checkout created (the answer is not documented in detail; it is the checkout id)",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Checkout"
+        }
+       }
+      }
+     },
+     "200": {
+      "description": "The same, with 200",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Checkout"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Validation error",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong key"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not found"
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/CheckoutRequest"
+       }
+      }
+     }
+    }
+   }
+  },
+  "/checkout/offline": {
+   "post": {
+    "operationId": "createOfflineCheckout",
+    "summary": "POS: create a checkout",
+    "tags": [
+     "POS"
+    ],
+    "security": [
+     {
+      "privateKey": []
+     }
+    ],
+    "responses": {
+     "201": {
+      "description": "Created",
+      "content": {
+       "application/vnd.aplazame.v3+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Checkout"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Validation error",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong key"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not found"
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/OfflineCheckoutRequest"
+       }
+      }
+     }
+    }
+   }
+  },
+  "/checkout/{checkoutId}/status": {
+   "get": {
+    "operationId": "getCheckoutStatus",
+    "summary": "POS: checkout status",
+    "tags": [
+     "POS"
+    ],
+    "security": [
+     {
+      "privateKey": []
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/vnd.aplazame.v3+json": {
+        "schema": {
+         "$ref": "#/components/schemas/CheckoutStatus"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Validation error",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong key"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not found"
+     }
+    },
+    "parameters": [
+     {
+      "name": "checkoutId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Checkout ID set by Aplazame"
+     }
+    ]
+   }
+  },
+  "/orders": {
+   "get": {
+    "operationId": "listOrders",
+    "summary": "List orders (filters go in the query as `property-lookup=value`, e.g. `id-startswith=e791f`)",
+    "tags": [
+     "Orders"
+    ],
+    "security": [
+     {
+      "privateKey": []
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/OrderList"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Validation error",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong key"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not found"
+     }
+    },
+    "parameters": [
+     {
+      "name": "page",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": "Page number"
+     },
+     {
+      "name": "id-startswith",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string"
+      }
+     },
+     {
+      "name": "id-endswith",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string"
+      }
+     },
+     {
+      "name": "total_amount-gte",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      }
+     },
+     {
+      "name": "total_amount-lte",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      }
+     },
+     {
+      "name": "created-gte",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "format": "date-time"
+      }
+     },
+     {
+      "name": "confirmed-isnull",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "enum": [
+        "yes",
+        "no"
+       ]
+      }
+     }
+    ]
+   }
+  },
+  "/orders/{orderId}": {
+   "get": {
+    "operationId": "getOrder",
+    "summary": "Order details",
+    "tags": [
+     "Orders"
+    ],
+    "security": [
+     {
+      "privateKey": []
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "type": "object",
+         "description": "An order",
+         "additionalProperties": true
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Validation error",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong key"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not found"
+     }
+    },
+    "parameters": [
+     {
+      "name": "orderId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Order ID."
+     }
+    ]
+   },
+   "put": {
+    "operationId": "editOrder",
+    "summary": "Edit an order",
+    "tags": [
+     "Orders"
+    ],
+    "security": [
+     {
+      "privateKey": []
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "No content"
+     },
+     "400": {
+      "description": "Validation error",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong key"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not found"
+     }
+    },
+    "parameters": [
+     {
+      "name": "orderId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Order ID."
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/OrderEdit"
+       }
+      }
+     }
+    }
+   },
+   "patch": {
+    "operationId": "patchOrder",
+    "summary": "Partially edit an order",
+    "tags": [
+     "Orders"
+    ],
+    "security": [
+     {
+      "privateKey": []
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "No content"
+     },
+     "400": {
+      "description": "Validation error",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong key"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not found"
+     }
+    },
+    "parameters": [
+     {
+      "name": "orderId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Order ID."
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/OrderPatch"
+       }
+      }
+     }
+    }
+   }
+  },
+  "/orders/{orderId}/captures": {
+   "get": {
+    "operationId": "listCaptures",
+    "summary": "Captures of an order",
+    "tags": [
+     "Orders"
+    ],
+    "security": [
+     {
+      "privateKey": []
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/CaptureList"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Validation error",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong key"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not found"
+     }
+    },
+    "parameters": [
+     {
+      "name": "orderId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Order ID."
+     }
+    ]
+   },
+   "post": {
+    "operationId": "createCapture",
+    "summary": "Request a capture (only for the pay-in-15-days product, on a confirmed order)",
+    "tags": [
+     "Orders"
+    ],
+    "security": [
+     {
+      "privateKey": []
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/CaptureCreated"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Validation error",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong key"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not found"
+     }
+    },
+    "parameters": [
+     {
+      "name": "orderId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Order ID."
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Amount"
+       }
+      }
+     }
+    }
+   }
+  },
+  "/orders/{orderId}/captures/{captureId}/refunds": {
+   "get": {
+    "operationId": "getCaptureRefunds",
+    "summary": "Refunds of a capture",
+    "tags": [
+     "Orders"
+    ],
+    "security": [
+     {
+      "privateKey": []
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Capture"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Validation error",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong key"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not found"
+     }
+    },
+    "parameters": [
+     {
+      "name": "orderId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Order ID."
+     },
+     {
+      "name": "captureId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Capture ID."
+     }
+    ]
+   },
+   "post": {
+    "operationId": "createCaptureRefund",
+    "summary": "Refund a capture",
+    "tags": [
+     "Orders"
+    ],
+    "security": [
+     {
+      "privateKey": []
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Capture"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Validation error",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong key"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not found"
+     }
+    },
+    "parameters": [
+     {
+      "name": "orderId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Order ID."
+     },
+     {
+      "name": "captureId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Capture ID."
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Amount"
+       }
+      }
+     }
+    }
+   }
+  },
+  "/orders/{orderId}/void": {
+   "get": {
+    "operationId": "listVoids",
+    "summary": "Voids of an order",
+    "tags": [
+     "Orders"
+    ],
+    "security": [
+     {
+      "privateKey": []
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/VoidList"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Validation error",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong key"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not found"
+     }
+    },
+    "parameters": [
+     {
+      "name": "orderId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Order ID."
+     }
+    ]
+   },
+   "post": {
+    "operationId": "createVoid",
+    "summary": "Void part of an order",
+    "tags": [
+     "Orders"
+    ],
+    "security": [
+     {
+      "privateKey": []
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/VoidList"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Validation error",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong key"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not found"
+     }
+    },
+    "parameters": [
+     {
+      "name": "orderId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Order ID."
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Amount"
+       }
+      }
+     }
+    }
+   }
+  },
+  "/orders/{orderId}/refund": {
+   "get": {
+    "operationId": "getRefundableAmount",
+    "summary": "Remaining amount that can be refunded",
+    "tags": [
+     "Orders"
+    ],
+    "security": [
+     {
+      "privateKey": []
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/RemainingAmount"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Validation error",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong key"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not found"
+     }
+    },
+    "parameters": [
+     {
+      "name": "orderId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Order ID."
+     }
+    ]
+   },
+   "post": {
+    "operationId": "createRefund",
+    "summary": "Refund online financing",
+    "tags": [
+     "Orders"
+    ],
+    "security": [
+     {
+      "privateKey": []
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/RemainingAmount"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Validation error",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong key"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not found"
+     }
+    },
+    "parameters": [
+     {
+      "name": "orderId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Order ID."
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Amount"
+       }
+      }
+     }
+    }
+   }
+  },
+  "/orders/{orderId}/cancel": {
+   "post": {
+    "operationId": "cancelOrder",
+    "summary": "Cancel a confirmed order",
+    "tags": [
+     "Orders"
+    ],
+    "security": [
+     {
+      "privateKey": []
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "No content"
+     },
+     "400": {
+      "description": "Validation error",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong key"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not found"
+     }
+    },
+    "parameters": [
+     {
+      "name": "orderId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Order ID."
+     }
+    ]
+   }
+  },
+  "/orders/{orderId}/history": {
+   "post": {
+    "operationId": "sendOrderHistory",
+    "summary": "Send the customer's purchase history",
+    "tags": [
+     "Orders"
+    ],
+    "security": [
+     {
+      "privateKey": []
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "No content"
+     },
+     "400": {
+      "description": "Validation error",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong key"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not found"
+     }
+    },
+    "parameters": [
+     {
+      "name": "orderId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Your order ID"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "array",
+        "items": {
+         "$ref": "#/components/schemas/HistoryItem"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/me/campaigns": {
+   "get": {
+    "operationId": "listCampaigns",
+    "summary": "List financing campaigns",
+    "tags": [
+     "Campaigns"
+    ],
+    "security": [
+     {
+      "privateKey": []
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/CampaignList"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Validation error",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong key"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not found"
+     }
+    },
+    "parameters": [
+     {
+      "name": "page",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": "Page number"
+     }
+    ]
+   },
+   "post": {
+    "operationId": "createCampaign",
+    "summary": "Create a financing campaign",
+    "tags": [
+     "Campaigns"
+    ],
+    "security": [
+     {
+      "privateKey": []
+     }
+    ],
+    "responses": {
+     "201": {
+      "description": "Created",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Campaign"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Validation error",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong key"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not found"
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/CampaignInput"
+       }
+      }
+     }
+    }
+   }
+  },
+  "/me/campaigns/{campaignId}": {
+   "get": {
+    "operationId": "getCampaign",
+    "summary": "Campaign details",
+    "tags": [
+     "Campaigns"
+    ],
+    "security": [
+     {
+      "privateKey": []
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Campaign"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Validation error",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong key"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not found"
+     }
+    },
+    "parameters": [
+     {
+      "name": "campaignId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Campaign ID."
+     }
+    ]
+   },
+   "put": {
+    "operationId": "editCampaign",
+    "summary": "Edit a campaign",
+    "tags": [
+     "Campaigns"
+    ],
+    "security": [
+     {
+      "privateKey": []
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "No content"
+     },
+     "400": {
+      "description": "Validation error",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong key"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not found"
+     }
+    },
+    "parameters": [
+     {
+      "name": "campaignId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Campaign ID."
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/CampaignInput"
+       }
+      }
+     }
+    }
+   },
+   "patch": {
+    "operationId": "patchCampaign",
+    "summary": "Partially edit a campaign",
+    "tags": [
+     "Campaigns"
+    ],
+    "security": [
+     {
+      "privateKey": []
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "No content"
+     },
+     "400": {
+      "description": "Validation error",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong key"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not found"
+     }
+    },
+    "parameters": [
+     {
+      "name": "campaignId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Campaign ID."
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/CampaignPatch"
+       }
+      }
+     }
+    }
+   },
+   "delete": {
+    "operationId": "deleteCampaign",
+    "summary": "Delete a campaign",
+    "tags": [
+     "Campaigns"
+    ],
+    "security": [
+     {
+      "privateKey": []
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "No content"
+     },
+     "400": {
+      "description": "Validation error",
+      "content": {
+       "application/vnd.aplazame.v1+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or wrong key"
+     },
+     "403": {
+      "description": "Forbidden"
+     },
+     "404": {
+      "description": "Not found"
+     }
+    },
+    "parameters": [
+     {
+      "name": "campaignId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Campaign ID."
+     }
+    ]
+   }
+  }
+ },
+ "components": {
+  "schemas": {
+   "Error": {
+    "type": "object",
+    "properties": {
+     "error": {
+      "type": "object",
+      "properties": {
+       "type": {
+        "type": "string"
+       },
+       "message": {
+        "type": "string"
+       },
+       "fields": {
+        "type": "object",
+        "additionalProperties": {
+         "type": "array",
+         "items": {
+          "type": "string"
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "Merchant": {
+    "type": "object",
+    "properties": {
+     "notification_url": {
+      "type": "string",
+      "format": "uri"
+     },
+     "success_url": {
+      "type": "string"
+     },
+     "pending_url": {
+      "type": "string"
+     },
+     "error_url": {
+      "type": "string"
+     },
+     "dismiss_url": {
+      "type": "string"
+     },
+     "ko_url": {
+      "type": "string"
+     },
+     "close_on_success": {
+      "type": "boolean"
+     },
+     "timeout_checkout": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 120
+     },
+     "timeout_extra": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2880
+     }
+    },
+    "required": [
+     "notification_url",
+     "success_url",
+     "pending_url",
+     "error_url"
+    ]
+   },
+   "Article": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "name": {
+      "type": "string"
+     },
+     "description": {
+      "type": "string"
+     },
+     "url": {
+      "type": "string",
+      "format": "uri"
+     },
+     "image_url": {
+      "type": "string",
+      "format": "uri"
+     },
+     "quantity": {
+      "type": "integer"
+     },
+     "price": {
+      "type": "integer",
+      "description": "Cents, tax not included"
+     },
+     "tax_rate": {
+      "type": "integer"
+     },
+     "discount": {
+      "type": "integer"
+     },
+     "discount_rate": {
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "url",
+     "image_url",
+     "quantity",
+     "price"
+    ]
+   },
+   "OrderOptions": {
+    "type": "object",
+    "properties": {
+     "event_date": {
+      "type": "string",
+      "format": "date"
+     }
+    }
+   },
+   "Order": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "articles": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/Article"
+      }
+     },
+     "discount": {
+      "type": "integer"
+     },
+     "discount_rate": {
+      "type": "integer"
+     },
+     "cart_discount": {
+      "type": "integer"
+     },
+     "cart_discount_rate": {
+      "type": "integer"
+     },
+     "currency": {
+      "type": "string",
+      "description": "ISO 4217"
+     },
+     "tax_rate": {
+      "type": "integer"
+     },
+     "total_amount": {
+      "type": "integer",
+      "description": "Cents"
+     },
+     "options": {
+      "$ref": "#/components/schemas/OrderOptions"
+     }
+    },
+    "required": [
+     "id",
+     "articles",
+     "currency",
+     "total_amount"
+    ]
+   },
+   "Customer": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "email": {
+      "type": "string"
+     },
+     "type": {
+      "type": "string",
+      "enum": [
+       "g",
+       "n",
+       "e"
+      ],
+      "description": "g guest, n new, e existing"
+     },
+     "gender": {
+      "type": "integer",
+      "enum": [
+       0,
+       1,
+       2,
+       3
+      ],
+      "description": "0 not known, 1 male, 2 female, 3 not applicable"
+     },
+     "first_name": {
+      "type": "string"
+     },
+     "last_name": {
+      "type": "string"
+     },
+     "phone": {
+      "type": "string"
+     },
+     "birthday": {
+      "type": "string",
+      "format": "date"
+     },
+     "language": {
+      "type": "string"
+     },
+     "date_joined": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "last_login": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "address": {
+      "type": "object",
+      "properties": {
+       "phone": {
+        "type": "string"
+       },
+       "alt_phone": {
+        "type": "string"
+       },
+       "street": {
+        "type": "string"
+       },
+       "address_addition": {
+        "type": "string"
+       },
+       "city": {
+        "type": "string"
+       },
+       "state": {
+        "type": "string"
+       },
+       "country": {
+        "type": "string",
+        "description": "ISO 3166-1"
+       },
+       "postcode": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "street",
+       "city",
+       "state",
+       "country",
+       "postcode"
+      ]
+     }
+    },
+    "required": [
+     "email"
+    ]
+   },
+   "Billing": {
+    "type": "object",
+    "properties": {
+     "first_name": {
+      "type": "string"
+     },
+     "last_name": {
+      "type": "string"
+     },
+     "phone": {
+      "type": "string"
+     },
+     "alt_phone": {
+      "type": "string"
+     },
+     "street": {
+      "type": "string"
+     },
+     "address_addition": {
+      "type": "string"
+     },
+     "city": {
+      "type": "string"
+     },
+     "state": {
+      "type": "string"
+     },
+     "country": {
+      "type": "string"
+     },
+     "postcode": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "first_name",
+     "last_name",
+     "street",
+     "city",
+     "state",
+     "country",
+     "postcode"
+    ]
+   },
+   "Shipping": {
+    "type": "object",
+    "properties": {
+     "first_name": {
+      "type": "string"
+     },
+     "last_name": {
+      "type": "string"
+     },
+     "phone": {
+      "type": "string"
+     },
+     "alt_phone": {
+      "type": "string"
+     },
+     "street": {
+      "type": "string"
+     },
+     "address_addition": {
+      "type": "string"
+     },
+     "city": {
+      "type": "string"
+     },
+     "state": {
+      "type": "string"
+     },
+     "country": {
+      "type": "string"
+     },
+     "postcode": {
+      "type": "string"
+     },
+     "name": {
+      "type": "string"
+     },
+     "price": {
+      "type": "integer",
+      "description": "Cents, tax not included"
+     },
+     "tax_rate": {
+      "type": "integer"
+     },
+     "discount": {
+      "type": "integer"
+     },
+     "discount_rate": {
+      "type": "integer"
+     },
+     "method": {
+      "type": "string",
+      "enum": [
+       "pickup_store",
+       "pickup_point",
+       "postal"
+      ]
+     }
+    },
+    "required": [
+     "first_name",
+     "last_name",
+     "street",
+     "city",
+     "state",
+     "country",
+     "postcode",
+     "name",
+     "price"
+    ]
+   },
+   "Product": {
+    "type": "object",
+    "properties": {
+     "type": {
+      "type": "string",
+      "enum": [
+       "pay_later",
+       "pay_in_4"
+      ]
+     }
+    }
+   },
+   "CheckoutRequest": {
+    "type": "object",
+    "properties": {
+     "merchant": {
+      "$ref": "#/components/schemas/Merchant"
+     },
+     "order": {
+      "$ref": "#/components/schemas/Order"
+     },
+     "customer": {
+      "$ref": "#/components/schemas/Customer"
+     },
+     "billing": {
+      "$ref": "#/components/schemas/Billing"
+     },
+     "shipping": {
+      "$ref": "#/components/schemas/Shipping"
+     },
+     "product": {
+      "$ref": "#/components/schemas/Product"
+     }
+    },
+    "required": [
+     "merchant",
+     "order",
+     "customer",
+     "shipping"
+    ]
+   },
+   "Checkout": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string",
+      "description": "Checkout ID set by Aplazame"
+     }
+    }
+   },
+   "OfflineCheckoutRequest": {
+    "type": "object",
+    "properties": {
+     "order": {
+      "$ref": "#/components/schemas/Order"
+     },
+     "customer": {
+      "$ref": "#/components/schemas/Customer"
+     },
+     "billing": {
+      "$ref": "#/components/schemas/Billing"
+     },
+     "shipping": {
+      "$ref": "#/components/schemas/Shipping"
+     },
+     "merchant": {
+      "type": "object",
+      "properties": {
+       "ipn_url": {
+        "type": "string",
+        "format": "uri"
+       }
+      }
+     }
+    },
+    "required": [
+     "order",
+     "customer"
+    ]
+   },
+   "Currency": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string"
+     },
+     "code": {
+      "type": "string"
+     },
+     "numeric": {
+      "type": "string"
+     },
+     "symbol": {
+      "type": "string"
+     }
+    }
+   },
+   "CheckoutStatus": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "mid": {
+      "type": "string"
+     },
+     "total_amount": {
+      "type": "integer"
+     },
+     "currency": {
+      "$ref": "#/components/schemas/Currency"
+     },
+     "status": {
+      "type": "string",
+      "enum": [
+       "ok",
+       "pending",
+       "ko"
+      ]
+     },
+     "status_reason": {
+      "type": "string",
+      "description": "confirmation_required, challenge_required, in_process, expired, expired_challenge, ko_generic, failed_challenge, confirmation_rejected_by_merchant, merchant_failed_to_confirm"
+     },
+     "sandbox": {
+      "type": "boolean"
+     }
+    }
+   },
+   "Notification": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "status": {
+      "type": "string",
+      "enum": [
+       "ok",
+       "pending",
+       "ko"
+      ]
+     },
+     "status_reason": {
+      "type": "string"
+     },
+     "sandbox": {
+      "type": "boolean"
+     },
+     "mid": {
+      "type": "string"
+     },
+     "total_amount": {
+      "type": "integer"
+     },
+     "tax_rate": {
+      "type": "integer"
+     },
+     "discount": {
+      "type": "integer"
+     },
+     "discount_rate": {
+      "type": "integer"
+     },
+     "currency": {
+      "$ref": "#/components/schemas/Currency"
+     },
+     "rejected": {
+      "type": "boolean"
+     },
+     "confirmed": {
+      "type": "string",
+      "nullable": true,
+      "format": "date-time"
+     },
+     "verified": {
+      "type": "string",
+      "nullable": true,
+      "format": "date-time"
+     },
+     "expired": {
+      "type": "string",
+      "nullable": true,
+      "format": "date-time"
+     },
+     "expires_at": {
+      "type": "string",
+      "nullable": true,
+      "format": "date-time"
+     },
+     "cancelled": {
+      "type": "string",
+      "nullable": true,
+      "format": "date-time"
+     },
+     "created": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   },
+   "Cursor": {
+    "type": "object",
+    "properties": {
+     "after": {
+      "type": "integer"
+     },
+     "before": {
+      "type": "integer"
+     }
+    }
+   },
+   "Paging": {
+    "type": "object",
+    "properties": {
+     "count": {
+      "type": "integer"
+     },
+     "next": {
+      "type": "string",
+      "nullable": true
+     },
+     "previous": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   },
+   "Refund": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "amount": {
+      "type": "integer"
+     },
+     "pending_amount": {
+      "type": "integer"
+     },
+     "accrual_date": {
+      "type": "string",
+      "format": "date"
+     },
+     "credit_to_customer": {
+      "type": "integer"
+     },
+     "completed": {
+      "type": "boolean"
+     },
+     "completed_but_defaults": {
+      "type": "boolean"
+     },
+     "created": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   },
+   "Capture": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "amount": {
+      "type": "integer"
+     },
+     "created": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "refunds": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/Refund"
+      }
+     },
+     "refunded_amount": {
+      "type": "integer"
+     },
+     "remaining_amount": {
+      "type": "integer"
+     }
+    }
+   },
+   "CaptureCreated": {
+    "type": "object",
+    "properties": {
+     "remaining_capture_amount": {
+      "type": "integer"
+     },
+     "id": {
+      "type": "string"
+     },
+     "amount": {
+      "type": "integer"
+     },
+     "created": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "refunds": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/Refund"
+      }
+     },
+     "refunded_amount": {
+      "type": "integer"
+     },
+     "remaining_amount": {
+      "type": "integer"
+     }
+    }
+   },
+   "CaptureList": {
+    "type": "object",
+    "properties": {
+     "remaining_capture_amount": {
+      "type": "integer"
+     },
+     "results": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/Capture"
+      }
+     }
+    }
+   },
+   "Amount": {
+    "type": "object",
+    "properties": {
+     "amount": {
+      "type": "integer",
+      "description": "Cents"
+     }
+    },
+    "required": [
+     "amount"
+    ]
+   },
+   "Void": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "amount": {
+      "type": "integer"
+     },
+     "created": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   },
+   "VoidList": {
+    "type": "object",
+    "properties": {
+     "remaining_amount": {
+      "type": "integer"
+     },
+     "results": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/Void"
+      }
+     }
+    }
+   },
+   "RemainingAmount": {
+    "type": "object",
+    "properties": {
+     "remaining_amount": {
+      "type": "integer"
+     }
+    }
+   },
+   "OrderEdit": {
+    "type": "object",
+    "properties": {
+     "order": {
+      "$ref": "#/components/schemas/Order"
+     }
+    },
+    "required": [
+     "order"
+    ]
+   },
+   "OrderPatch": {
+    "type": "object",
+    "properties": {
+     "order": {
+      "type": "object",
+      "description": "Partial order: any of the fields of an order",
+      "additionalProperties": true
+     }
+    }
+   },
+   "OrderList": {
+    "type": "object",
+    "properties": {
+     "cursor": {
+      "$ref": "#/components/schemas/Cursor"
+     },
+     "paging": {
+      "$ref": "#/components/schemas/Paging"
+     },
+     "results": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "description": "An order",
+       "additionalProperties": true
+      }
+     }
+    }
+   },
+   "HistoryItem": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "amount": {
+      "type": "integer"
+     },
+     "due": {
+      "type": "integer",
+      "nullable": true
+     },
+     "status": {
+      "type": "string",
+      "enum": [
+       "pending",
+       "cancelled",
+       "processing",
+       "complete"
+      ]
+     },
+     "type": {
+      "type": "string"
+     },
+     "order_date": {
+      "type": "string",
+      "description": "Date of the order"
+     },
+     "currency": {
+      "type": "string"
+     },
+     "billing": {
+      "$ref": "#/components/schemas/Billing"
+     },
+     "shipping": {
+      "$ref": "#/components/schemas/Shipping"
+     }
+    },
+    "required": [
+     "id",
+     "amount",
+     "status",
+     "type",
+     "order_date",
+     "currency"
+    ]
+   },
+   "Campaign": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "name": {
+      "type": "string"
+     },
+     "start_date": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "end_date": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "interest": {
+      "type": "integer"
+     },
+     "partial": {
+      "type": "boolean"
+     },
+     "num_instalments": {
+      "type": "array",
+      "items": {
+       "type": "integer"
+      }
+     },
+     "created": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   },
+   "CampaignInput": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string"
+     },
+     "start_date": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "end_date": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "interest": {
+      "type": "integer"
+     },
+     "partial": {
+      "type": "boolean"
+     },
+     "num_instalments": {
+      "type": "array",
+      "items": {
+       "type": "integer"
+      }
+     },
+     "min_order_amount": {
+      "type": "integer"
+     },
+     "max_order_amount": {
+      "type": "integer"
+     }
+    },
+    "required": [
+     "name",
+     "start_date",
+     "interest"
+    ]
+   },
+   "CampaignPatch": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string"
+     },
+     "start_date": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "end_date": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "interest": {
+      "type": "integer"
+     },
+     "partial": {
+      "type": "boolean"
+     },
+     "num_instalments": {
+      "type": "array",
+      "items": {
+       "type": "integer"
+      }
+     }
+    }
+   },
+   "CampaignList": {
+    "type": "object",
+    "properties": {
+     "cursor": {
+      "$ref": "#/components/schemas/Cursor"
+     },
+     "paging": {
+      "$ref": "#/components/schemas/Paging"
+     },
+     "results": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/Campaign"
+      }
+     }
+    }
+   },
+   "ConfirmationResponse": {
+    "type": "object",
+    "properties": {
+     "status": {
+      "type": "string",
+      "enum": [
+       "ok",
+       "ko"
+      ]
+     },
+     "order_id": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "status"
+    ]
+   }
+  },
+  "securitySchemes": {
+   "privateKey": {
+    "type": "http",
+    "scheme": "bearer",
+    "description": "The private API key of the merchant"
+   }
+  }
+ }
+}
